@@ -1,37 +1,46 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"golang-mongodb/internal/database"
+	"golang-mongodb/internal/handler"
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main(){
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file: %v", err)
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 
 	databaseURI := os.Getenv("DATABASE_URI")
 
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(databaseURI).SetServerAPIOptions(serverAPI)
-
-	client, err := mongo.Connect(context.Background(), opts)
+	err := database.Init((databaseURI), "development")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Println("Connected to MongoDB!")
 
-	err = client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Database started successfully!")
+	defer func(){
+		err := database.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+	
+	r := gin.Default()
+
+	r.GET("/products", handler.GetProducts)
+	r.GET("/products/:id", handler.GetProductById)
+
+	r.POST("/products", handler.AddProduct)
+	r.PATCH("/products/:id/stock", handler.UpdateProductStockById)
+	r.PATCH("/products/:id/price", handler.UpdateProductPriceById)
+	r.DELETE("/products/:id", handler.DeleteProductById)
+
+	r.Run(":8080")
 }
