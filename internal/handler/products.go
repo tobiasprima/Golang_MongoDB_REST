@@ -71,7 +71,29 @@ func AddProduct(c *gin.Context){
 }
 
 func UpdateProductStockById(c *gin.Context){
+	id := c.Param("id")
+	_id, err := primitive.ObjectIDFromHex(id)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id provided"})
+		return
+	}
+
+	var body struct {
+		Stock int `json:"stock" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	_, err = database.Products.UpdateOne(c, bson.M{"_id": _id}, bson.M{"$set": bson.M{"stock": body.Stock}})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update product stock"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "product stock updated"})
 }
 
 func UpdateProductPriceById(c *gin.Context){
