@@ -113,7 +113,7 @@ func UpdateProductPriceById(c *gin.Context){
 		return
 	}
 
-	_, err = database.Products.UpdateOne(c, bson.M{"_id": _id}, bson.M{"$set": bson.M{"stock": body.Price}})
+	_, err = database.Products.UpdateOne(c, bson.M{"_id": _id}, bson.M{"$set": bson.M{"price": body.Price}})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update product price"})
 		return
