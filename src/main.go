@@ -4,17 +4,12 @@ import (
 	"fmt"
 	"golang-mongodb/internal/database"
 	"golang-mongodb/internal/handler"
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main(){
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
 
 	databaseURI := os.Getenv("DATABASE_URI")
 
@@ -44,3 +39,4 @@ func main(){
 
 	r.Run(":8080")
 }
+
