@@ -26,6 +26,26 @@ func GetProducts(c *gin.Context){
 	c.JSON(http.StatusOK, products)
 }
 
+func GetProductById(c *gin.Context){
+	id := c.Param("id")
+	_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id provided"})
+		return
+	}
+
+	result := database.Products.FindOne(c, primitive.M{"_id": _id})
+	product := model.Product{}
+	err = result.Decode(&product)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to find product"})
+		return
+	}
+
+	c.JSON(http.StatusOK, product)
+}
+
 func AddProduct(c *gin.Context){
 	var body model.CreateProductRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -48,10 +68,6 @@ func AddProduct(c *gin.Context){
 	}
 
 	c.JSON(http.StatusCreated, product)
-}
-
-func GetProductById(c *gin.Context){
-
 }
 
 func UpdateProductStockById(c *gin.Context){
