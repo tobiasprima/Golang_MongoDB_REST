@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -29,4 +30,16 @@ func main(){
 			fmt.Println(err)
 		}
 	}()
+	
+	r := gin.Default()
+
+	r.GET("/products")
+	r.GET("/products/:id")
+
+	r.POST("/products")
+	r.PATCH("/products/:id/stock")
+	r.PATCH("/products/:id/price")
+	r.DELETE("/products/:id")
+
+	r.Run(":8080")
 }
