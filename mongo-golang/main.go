@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"golang-mongodb/internal/database"
+	"golang-mongodb/internal/handler"
 	"log"
 	"os"
 
@@ -33,13 +34,13 @@ func main(){
 	
 	r := gin.Default()
 
-	r.GET("/products")
-	r.GET("/products/:id")
+	r.GET("/products", handler.GetProducts)
+	r.GET("/products/:id", handler.GetProductById)
 
-	r.POST("/products")
-	r.PATCH("/products/:id/stock")
-	r.PATCH("/products/:id/price")
-	r.DELETE("/products/:id")
+	r.POST("/products", handler.AddProduct)
+	r.PATCH("/products/:id/stock", handler.UpdateProductStockById)
+	r.PATCH("/products/:id/price", handler.UpdateProductPriceById)
+	r.DELETE("/products/:id", handler.DeleteProductById)
 
 	r.Run(":8080")
 }
